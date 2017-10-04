@@ -1,3 +1,4 @@
 # nix_csv_parser
 
-Parses Nix sensor CSV data, creates HTML-based swatches and copies them to the clipboard.
+Parses Nix Color Sensor CSV data, outputs HTML-based swatches to clipboard for pasting elsewhere.
+Optionally sort output by hue, saturation, or value.
