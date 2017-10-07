@@ -90,6 +90,38 @@ class Swatch():
         )
 
 
+class CSVParser():
+    """
+    Parses Nix CSV Data
+    """
+    file = None
+    swatches = []
+    sort_type = None
+    output = []
+
+    def __init__(self):
+        pass
+
+
+    def parse_args(self):
+        """ Parses command line arguments and sets options """
+        pass
+
+
+    def get_swatches(self, html=False):
+        """ Retrieves swatch data and stores in swatches """
+        pass
+
+
+    def sort_swatches(self, sort_type):
+        """ Apply sorting """
+        pass
+
+
+    def output_swatches(self):
+        """ Output swatches to console and clipboard """
+        pass
+
 
 def exit_wait(wait=0):
     """
