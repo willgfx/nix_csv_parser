@@ -48,6 +48,49 @@ SWATCH_CHAR = '▄'
 SWATCH_SIZE = '72px'
 
 
+class Swatch():
+    """
+    Holds swatch data
+    """
+    hex_value = ''
+    rgb_value = (0, 0, 0)
+    html = ''
+
+    def __init__(self, hex_value, rgb_value):
+        self.hex_value = hex_value
+
+        if rgb_value is not None:
+            self.rgb_value = rgb_value
+        else:
+            # Derive rgb value from hex if not provided
+            red, green, blue = bytes.fromhex(hex_value[1:])
+            self.rgb_value = (red, green, blue)
+
+        self.set_html()
+
+
+    def set_html(self):
+        """ Set swatch output html """
+        self.html = (
+            '<font color=%s size=%s>%s </font>'
+            '<b>HEX:</b> %s - <b>RGB:</b> %s<br>\n' % (
+                self.hex_value, SWATCH_SIZE, SWATCH_CHAR,
+                self.hex_value, str(self.rgb_value)
+            )
+        )
+
+
+    def print(self):
+        """ Output swatch data to console """
+        print('  %s HEX: %s - RGB: %s' % (
+                SWATCH_CHAR,
+                self.hex_value,
+                self.rgb_value
+            )
+        )
+
+
+
 def exit_wait(wait=0):
     """
     Optionally wait before exiting
