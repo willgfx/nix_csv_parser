@@ -11,7 +11,6 @@ else:
     cmd = './nix_csv_parser.py'
 
 class NixCSVParserTests(unittest.TestCase):
-
     def run_cmd(self, cmd_line):
         print(cmd_line)
         os.system(cmd_line)
@@ -91,7 +90,7 @@ class NixCSVParserTests(unittest.TestCase):
         )
         cmd_line = cmd + ' --clipboard'
         print('### CLIPBOARD HTML')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_no_data(self):
         cmd_line = cmd + ' --sort-hue'
