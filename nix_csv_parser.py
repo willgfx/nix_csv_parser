@@ -137,7 +137,7 @@ class CSVParser():
     """Parse Nix CSV data from file or clipboard"""
 
     mode = 'file'
-    file = None
+    csv_file = None
     swatches = []
     sort_type = None
     wait = 0
@@ -187,7 +187,7 @@ class CSVParser():
                 elif arg[0] == '-':  # single letter options, may be combined
                     options.extend(list(arg[1:]))
                 elif '.csv' in arg.lower():  # CSV file
-                    self.file = arg
+                    self.csv_file = arg
 
             # Error out for invalid options.
             possible_options = (
@@ -292,10 +292,10 @@ class CSVParser():
                     exit_after=True, wait=self.wait
                 )
         else:
-            if self.file is not None:
-                msg_display('status_file', extra_info=self.file)
-                with open(self.file) as file:
-                    self.get_swatches_from_data(file)
+            if self.csv_file is not None:
+                msg_display('status_file', extra_info=self.csv_file)
+                with open(self.csv_file) as f:
+                    self.get_swatches_from_data(f)
             else:
                 msg_display(
                     ['error_nodata', 'info_usage', 'info_tryhelp'],
@@ -368,4 +368,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
