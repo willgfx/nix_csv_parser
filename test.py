@@ -1,53 +1,60 @@
-import unittest
 import os
+import sys
+import unittest
 
 import pyperclip
 
+cmd = ''
+if sys.platform == 'win32':
+    cmd = 'nix_csv_parser.py'
+else:
+    cmd = './nix_csv_parser.py'
+
 class NixCSVParserTests(unittest.TestCase):
 
-    def run_cmd(self, cmd):
-        print(cmd)
-        os.system(cmd)
+    def run_cmd(self, cmd_line):
+        print(cmd_line)
+        os.system(cmd_line)
 
     def test_no_args(self):
-        cmd = 'nix_csv_parser.py'
+        cmd_line = cmd
         print('### NO ARGS')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_help(self):
-        cmd = 'nix_csv_parser.py --help'
+        cmd_line = cmd + ' --help'
         print('### HELP')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_version(self):
-        cmd = 'nix_csv_parser.py --version'
+        cmd_line = cmd + ' --version'
         print('### VERSION')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_csv_file_unsorted(self):
-        cmd = 'nix_csv_parser.py test.csv'
+        cmd_line = cmd + ' test.csv'
         print('### FILE - UNSORTED')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_csv_file_unsorted_wait(self):
-        cmd = 'nix_csv_parser.py test.csv --wait 1'
+        cmd_line = cmd + ' test.csv --wait 1'
         print('### FILE - UNSORTED - WAIT')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_csv_file_sort_hue(self):
-        cmd = 'nix_csv_parser.py test.csv --sort-hue'
+        cmd_line = cmd + ' test.csv --sort-hue'
         print('### FILE - HUE SORT')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_csv_file_sort_sat(self):
-        cmd = 'nix_csv_parser.py test.csv --sort-sat'
+        cmd_line = cmd + ' test.csv --sort-sat'
         print('### FILE - SAT SORT')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_csv_file_sort_value(self):
-        cmd = 'nix_csv_parser.py test.csv --sort-val'
+        cmd_line = cmd + ' test.csv --sort-val'
         print('### FILE - VAL SORT')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_clipboard_data(self):
         pyperclip.copy(
@@ -61,15 +68,15 @@ class NixCSVParserTests(unittest.TestCase):
             'D Pad,,35.63,-1.24,0.49,8.24,8.81,9.44,82,84,83,#525453,65%,55%,57%,32%,0.0867,0.0887,0.0867,0.0862,0.0890,0.0867,0.0844,0.0894,0.0864,\n'
             'Rear Label,,64.79,-1.15,7.27,31.79,33.78,31.32,161,157,144,#A19D90,39%,33%,42%,1%,0.3353,0.3344,0.2877,0.3458,0.3390,0.2879,0.3548,0.3386,0.2799,\n'
         )
-        cmd = 'nix_csv_parser.py --clipboard'
+        cmd_line = cmd + ' --clipboard'
         print('### CLIPBOARD DATA')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_clipboard_path(self):
         pyperclip.copy('test.csv')
-        cmd = 'nix_csv_parser.py --clipboard'
+        cmd_line = cmd + ' --clipboard'
         print('### CLIPBOARD FILE PATH')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_clipboard_html(self):
         pyperclip.copy(
@@ -82,30 +89,30 @@ class NixCSVParserTests(unittest.TestCase):
             '<font color=#525453 size=72px>▄ </font><b>HEX:</b> #525453 - <b>RGB:</b> (82, 84, 83)<br>\n'
             '<font color=#A19D90 size=72px>▄ </font><b>HEX:</b> #A19D90 - <b>RGB:</b> (161, 157, 144)<br>\n'
         )
-        cmd = 'nix_csv_parser.py --clipboard'
+        cmd_line = cmd + ' --clipboard'
         print('### CLIPBOARD HTML')
         self.run_cmd(cmd)
 
     def test_no_data(self):
-        cmd = 'nix_csv_parser.py --sort-hue'
+        cmd_line = cmd + ' --sort-hue'
         print('### NO DATA')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_clipbaord_no_data(self):
         pyperclip.copy('nodata')
-        cmd = 'nix_csv_parser.py --clipboard'
+        cmd_line = cmd + ' --clipboard'
         print('### NO CLIPBOARD DATA')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_bad_option_long(self):
-        cmd = 'nix_csv_parser.py --badoption'
+        cmd_line = cmd + ' --badoption'
         print('### BAD OPTION - LONG')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
     def test_bad_option_short(self):
-        cmd = 'nix_csv_parser.py -x'
+        cmd_line = cmd + ' -x'
         print('### BAD OPTION - SHORT')
-        self.run_cmd(cmd)
+        self.run_cmd(cmd_line)
 
 if __name__ == '__main__':
     unittest.main()
