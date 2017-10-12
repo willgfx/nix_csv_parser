@@ -2,48 +2,20 @@
 # encoding: utf-8
 # by Will Fuller, sinistergfx@gmail.com
 
-"""Usage:
-    nix_csv_parser.py [CSV filename] [options]
-
-Parses Nix Color Sensor CSV data, outputs HTML-based swatches to clipboard.
+"""Parses Nix Color Sensor CSV data, outputs HTML-based swatches to clipboard.
+Defaults to using data or CSV file path from the clipboard.
 Optionally sort output by hue, saturation, or value.
 
-Options:
-    Single letter options may be combined. ex: '-cvw 2'
+Created by Will Fuller, sinistergfx@gmail.com"""
 
-    -c, --clipboard     : Use CSV data or file path from clipboard
-
-    -h, --sort-hue      : Sort swatches by hue
-    -s, --sort-sat      : Sort swatches by saturation
-    -v, --sort-val      : Sort swatches by value
-
-    -w #, --wait #      : Wait # seconds before exit
-                          (must be last in group if combining)
-
-    -H, --help          : Show this help message
-    -V, --version       : Show version
-
-Example usage:
-    $ nix_csv_parser.py somefile.csv
-        (unsorted output from CSV file)
-    $ nix_csv_parser.py somefile.csv --sort-value --wait 3
-        (value sorted output from CSV file, wait 3 seconds)
-    $ nix_csv_parser.py -cs
-        (saturation sorted output from clipboard)
-    $ nix_csv_parser.py -chw 5
-        (hue sorted output from clipboard, wait 5 seconds)
-
-Created by Will Fuller, sinistergfx@gmail.com
-"""
-
-import sys
 import time
 import csv
 import colorsys
+import argparse
 
 import pyperclip
 
-VERSION = '1.1.1 (2017.10.09)'
+VERSION = '2.0.0 (2017.10.12)'
 SWATCH_CHAR = '▄'
 SWATCH_SIZE = '72px'
 
@@ -55,26 +27,16 @@ def exit_wait(wait=0):
     exit()
 
 
-def msg_display(msg, extra_info='', exit_after=False, wait=0):
+def messager(msg, extra_info='', exit_after=False, wait=0):
     """Central message handling, optionally exit after display"""
 
     messages = {
         'error_clipboard_nodata':
-            '! Error - No CSV data found in clipboard.\n',
+            'Error: No CSV data found in clipboard.\n',
         'error_nodata':
-            '! Error - No CSV data provided.',
-        'error_option':
-            "! Error - Unrecognized option: '%s'\n" % extra_info,
-        'error_wait':
-            '! Error - Invalid/missing wait value.\n',
-        'info_help':
-            __doc__,
+            'Error: No CSV data provided.\n',
         'info_tryhelp':
             "Try 'nix_csv_parser.py --help' for more information\n",
-        'info_usage':
-            '\n'.join(__doc__.splitlines()[0:3]),
-        'info_version':
-            'version: %s\n' % VERSION,
         'status_clipboard':
             'Reading CSV data from clipboard...\n',
         'status_file':
@@ -139,96 +101,21 @@ class CSVParser():
     mode = 'file'
     csv_file = None
     swatches = []
+    swatch_count = 0
     sort_type = None
     wait = 0
 
-    def __init__(self):
-        self.parse_args()
-
-
-    def parse_args(self):
-        """Parse command line arguments and set options"""
-
-        if len(sys.argv) <= 1:
-            # Abort if no arguments
-            msg_display('info_usage', exit_after=True, wait=1)
+    def __init__(self, options):
+        if options.file is None:
+            clipboard = pyperclip.paste().strip('"')
+            if '.csv' in clipboard.lower():
+                self.csv_file = clipboard
+            else:
+                self.mode = 'clipboard'
         else:
-            args = [str(arg) for arg in sys.argv[1:]]
-
-            # Determine wait value
-            for i, arg in enumerate(args):
-                if (arg[0] == '-' and arg[-1] == 'w') or arg == '--wait':
-                    # Next arg should be wait value
-                    if len(args) > i+1 and args[i+1].isdigit():
-                        self.wait = int(args[i+1])
-
-                        # Keep wait value from showing up in options
-                        del args[i+1]
-
-                        # Done with wait args, might as well remove them
-                        if arg == '--wait':
-                            del args[i]
-                        else:
-                            args[i] = arg.strip('w')
-
-                        break
-                    # Next arg is missing or isn't an integer, error out
-                    else:
-                        msg_display(
-                            ['error_wait', 'info_tryhelp'],
-                            exit_after=True, wait=1
-                        )
-
-            # Generate options list and grab CSV file
-            options = []
-            for arg in args:
-                if arg[0:2] == '--':  # long name options
-                    options.append(arg[2:])
-                elif arg[0] == '-':  # single letter options, may be combined
-                    options.extend(list(arg[1:]))
-                elif '.csv' in arg.lower():  # CSV file
-                    self.csv_file = arg
-
-            # Error out for invalid options.
-            possible_options = (
-                'H', 'help', 'V', 'version', 'c', 'clipboard',
-                'h', 'sort-hue', 's', 'sort-sat', 'v', 'sort-val')
-            for option in options:
-                if option not in possible_options:
-                    if len(option) > 1:
-                        prefix = '--'
-                    else:
-                        prefix = '-'
-
-                    msg_display(
-                        ['error_option', 'info_tryhelp'],
-                        extra_info=prefix+option,
-                        exit_after=True,
-                        wait=self.wait)
-
-            # Information display options
-            if 'H' in options or 'help' in options:
-                msg_display('info_help', exit_after=True, wait=self.wait)
-            elif 'V' in options or 'version' in options:
-                msg_display('info_version', exit_after=True, wait=self.wait)
-
-            # Determine file/clipboard mode
-            if 'c' in options or 'clipboard' in options:
-                clipboard_data = pyperclip.paste()
-                # Detect if file path is in clipboard
-                if '.csv' in clipboard_data.lower():
-                    self.file = clipboard_data.strip('"')  # because: Windows
-                else:  # Assume data is in clipboard, switch mode
-                    self.mode = 'clipboard'
-
-            # Determine sort type
-            if 'h' in options or 'sort-hue' in options:
-                self.sort_type = 'hue'
-            elif 's' in options or 'sort-sat' in options:
-                self.sort_type = 'saturation'
-            elif 'v' in options or 'sort-val' in options:
-                self.sort_type = 'value'
-
+            self.csv_file = options.file
+        self.sort_type = options.sort
+        self.wait = options.wait
 
 
     def get_swatches_from_data(self, data, html=False):
@@ -276,7 +163,7 @@ class CSVParser():
 
         # Get swatches from clipboard or CSV file
         if self.mode == 'clipboard':
-            msg_display('status_clipboard')
+            messager('status_clipboard')
 
             clipboard_data = pyperclip.paste()
 
@@ -284,21 +171,21 @@ class CSVParser():
                 self.get_swatches_from_data(clipboard_data.splitlines())
                 # splitlines() only works here? ^ wut o_O
             elif '<font color=#' in clipboard_data:  # must be our own HTML output
-                msg_display('status_html')
+                messager('status_html')
                 self.get_swatches_from_data(clipboard_data, html=True)
             else:
-                msg_display(
+                messager(
                     ['error_clipboard_nodata', 'info_tryhelp'],
                     exit_after=True, wait=self.wait
                 )
         else:
             if self.csv_file is not None:
-                msg_display('status_file', extra_info=self.csv_file)
+                messager('status_file', self.csv_file)
                 with open(self.csv_file) as f:
                     self.get_swatches_from_data(f)
             else:
-                msg_display(
-                    ['error_nodata', 'info_usage', 'info_tryhelp'],
+                messager(
+                    ['error_nodata', 'info_tryhelp'],
                     exit_after=True, wait=self.wait
                 )
 
@@ -344,10 +231,31 @@ def main():
     """
     MAIN
     """
+    arg_parser = argparse.ArgumentParser(
+        description='\n'.join(__doc__.splitlines()[0:4]),
+        epilog=__doc__.splitlines()[-1]
+    )
+    arg_parser.add_argument(
+        '-f', '--file', metavar='NAME',
+        help='use data from CSV file: NAME'
+    )
+    arg_parser.add_argument(
+        '-s', '--sort', metavar='TYPE',
+        help='sort swatches by TYPE(hue, sat, val)'
+    )
+    arg_parser.add_argument(
+        '-w', '--wait', metavar='N', type=int, default=0,
+        help='wait N seconds before exiting'
+    )
+    arg_parser.add_argument(
+        '-v', '--version', action='version', version='version: %s' % VERSION
+    )
 
     print() # Blank line for formatting
 
-    csv_parser = CSVParser()
+    options = arg_parser.parse_args()
+
+    csv_parser = CSVParser(options)
     csv_parser.get_swatches()
     csv_parser.sort_swatches()
     csv_parser.output_swatches()

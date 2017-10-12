@@ -14,6 +14,7 @@ class NixCSVParserTests(unittest.TestCase):
     def run_cmd(self, cmd_line):
         print(cmd_line)
         os.system(cmd_line)
+        print()
 
     def test_no_args(self):
         cmd_line = cmd
@@ -31,27 +32,27 @@ class NixCSVParserTests(unittest.TestCase):
         self.run_cmd(cmd_line)
 
     def test_csv_file_unsorted(self):
-        cmd_line = cmd + ' test.csv'
+        cmd_line = cmd + ' --file test.csv'
         print('### FILE - UNSORTED')
         self.run_cmd(cmd_line)
 
     def test_csv_file_unsorted_wait(self):
-        cmd_line = cmd + ' test.csv --wait 1'
+        cmd_line = cmd + ' --file test.csv --wait 1'
         print('### FILE - UNSORTED - WAIT')
         self.run_cmd(cmd_line)
 
     def test_csv_file_sort_hue(self):
-        cmd_line = cmd + ' test.csv --sort-hue'
+        cmd_line = cmd + ' --file test.csv --sort hue'
         print('### FILE - HUE SORT')
         self.run_cmd(cmd_line)
 
     def test_csv_file_sort_sat(self):
-        cmd_line = cmd + ' test.csv --sort-sat'
+        cmd_line = cmd + ' --file test.csv --sort sat'
         print('### FILE - SAT SORT')
         self.run_cmd(cmd_line)
 
     def test_csv_file_sort_value(self):
-        cmd_line = cmd + ' test.csv --sort-val'
+        cmd_line = cmd + ' --file test.csv --sort val'
         print('### FILE - VAL SORT')
         self.run_cmd(cmd_line)
 
@@ -67,13 +68,13 @@ class NixCSVParserTests(unittest.TestCase):
             'D Pad,,35.63,-1.24,0.49,8.24,8.81,9.44,82,84,83,#525453,65%,55%,57%,32%,0.0867,0.0887,0.0867,0.0862,0.0890,0.0867,0.0844,0.0894,0.0864,\n'
             'Rear Label,,64.79,-1.15,7.27,31.79,33.78,31.32,161,157,144,#A19D90,39%,33%,42%,1%,0.3353,0.3344,0.2877,0.3458,0.3390,0.2879,0.3548,0.3386,0.2799,\n'
         )
-        cmd_line = cmd + ' --clipboard'
+        cmd_line = cmd
         print('### CLIPBOARD DATA')
         self.run_cmd(cmd_line)
 
     def test_clipboard_path(self):
         pyperclip.copy('test.csv')
-        cmd_line = cmd + ' --clipboard'
+        cmd_line = cmd
         print('### CLIPBOARD FILE PATH')
         self.run_cmd(cmd_line)
 
@@ -88,18 +89,19 @@ class NixCSVParserTests(unittest.TestCase):
             '<font color=#525453 size=72px>▄ </font><b>HEX:</b> #525453 - <b>RGB:</b> (82, 84, 83)<br>\n'
             '<font color=#A19D90 size=72px>▄ </font><b>HEX:</b> #A19D90 - <b>RGB:</b> (161, 157, 144)<br>\n'
         )
-        cmd_line = cmd + ' --clipboard'
+        cmd_line = cmd
         print('### CLIPBOARD HTML')
         self.run_cmd(cmd_line)
 
     def test_no_data(self):
-        cmd_line = cmd + ' --sort-hue'
+        cmd_line = cmd + ' --sort hue'
+        pyperclip.copy('nodata')
         print('### NO DATA')
         self.run_cmd(cmd_line)
 
     def test_clipbaord_no_data(self):
         pyperclip.copy('nodata')
-        cmd_line = cmd + ' --clipboard'
+        cmd_line = cmd
         print('### NO CLIPBOARD DATA')
         self.run_cmd(cmd_line)
 
