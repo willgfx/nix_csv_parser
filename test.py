@@ -17,7 +17,7 @@ class NixCSVParserTests(unittest.TestCase):
     def run_cmd(self, cmd_line):
         print(cmd_line)
         os.system(cmd_line)
-        print()
+        print('\n\n')
 
     def test_no_args(self):
         cmd_line = cmd
@@ -57,6 +57,11 @@ class NixCSVParserTests(unittest.TestCase):
     def test_csv_file_sort_value(self):
         cmd_line = cmd + ' --file test.csv --sort val'
         print('### FILE - VAL SORT')
+        self.run_cmd(cmd_line)
+
+    def test_csv_file_sort_value(self):
+        cmd_line = cmd + ' --file test.csv --sort bad'
+        print('### FILE - BAD SORT')
         self.run_cmd(cmd_line)
 
     def test_clipboard_data(self):

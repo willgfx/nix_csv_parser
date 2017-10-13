@@ -15,7 +15,7 @@ import argparse
 
 import pyperclip
 
-VERSION = '2.0.0 (2017.10.12)'
+VERSION = '2.1.0 (2017.10.12)'
 SWATCH_CHAR = '▄'
 SWATCH_SIZE = '72px'
 
@@ -35,6 +35,8 @@ def messager(msg, extra_info='', exit_after=False, wait=0):
             'Error: No CSV data found in clipboard.\n',
         'error_nodata':
             'Error: No CSV data provided.\n',
+        'error_sort':
+            'Error: Unrecognized sort type: %s\n' % extra_info,
         'info_tryhelp':
             "Try 'nix_csv_parser.py --help' for more information\n",
         'status_clipboard':
@@ -196,24 +198,29 @@ class CSVParser():
         if self.sort_type is None:
             return
 
-        if self.sort_type == 'hue':
+        sort_type = self.sort_type.lower()
+
+        if 'hue' in sort_type:
             self.swatches = sorted(
                 self.swatches,
                 key=lambda x: (colorsys.rgb_to_hsv(
                     x.rgb_value[0], x.rgb_value[1], x.rgb_value[2])[0])
             )
-        elif self.sort_type == 'saturation':
+        elif 'sat' in sort_type:
             self.swatches = sorted(
                 self.swatches,
                 key=lambda x: (colorsys.rgb_to_hsv(
                     x.rgb_value[0], x.rgb_value[1], x.rgb_value[2])[1])
             )
-        elif self.sort_type == 'value':
+        elif 'val' in sort_type:
             self.swatches = sorted(
                 self.swatches,
                 key=lambda x: (colorsys.rgb_to_hsv(
                     x.rgb_value[0], x.rgb_value[1], x.rgb_value[2])[2])
             )
+        else:
+            messager(['error_sort', 'info_tryhelp'], extra_info=sort_type,
+                     exit_after=True, wait=self.wait)
 
 
     def output_swatches(self):
