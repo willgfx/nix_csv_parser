@@ -15,7 +15,7 @@ import argparse
 
 import pyperclip
 
-VERSION = '2.1.0 (2017.10.12)'
+VERSION = '2.1.1 (2017.10.15)'
 SWATCH_CHAR = '▄'
 SWATCH_SIZE = '72px'
 
@@ -60,24 +60,20 @@ def messager(msg, extra_info='', exit_after=False, wait=0):
 class Swatch():
     """Hold swatch values, generate HTML output"""
 
-    hex_value = ''
-    rgb_value = (0, 0, 0)
-    html = ''
-
     def __init__(self, hex_value, rgb_value):
         self.hex_value = hex_value
+        self.rgb_value = rgb_value
+        self.html = ''
 
-        if rgb_value is not None:
-            self.rgb_value = rgb_value
-        else:
+        if rgb_value is None:
             # Derive rgb value from hex if not provided
             red, green, blue = bytes.fromhex(hex_value[1:])
             self.rgb_value = (red, green, blue)
 
-        self.set_html()
+        self._get_html_()
 
 
-    def set_html(self):
+    def _get_html_(self):
         """Generate swatch output HTML"""
 
         self.html = (
@@ -87,7 +83,6 @@ class Swatch():
                 self.hex_value, str(self.rgb_value)
             )
         )
-
 
     def print(self):
         """Output swatch data to console"""
@@ -100,14 +95,14 @@ class Swatch():
 class CSVParser():
     """Parse Nix CSV data from file or clipboard"""
 
-    mode = 'file'
-    csv_file = None
-    swatches = []
-    swatch_count = 0
-    sort_type = None
-    wait = 0
-
     def __init__(self, options):
+        self.mode = 'file'
+        self.csv_file = None
+        self.swatches = []
+        self.swatch_count = 0
+        self.sort_type = options.sort
+        self.wait = options.wait
+
         if options.file is None:
             clipboard = pyperclip.paste().strip('"')
             if '.csv' in clipboard.lower():
@@ -116,11 +111,9 @@ class CSVParser():
                 self.mode = 'clipboard'
         else:
             self.csv_file = options.file
-        self.sort_type = options.sort
-        self.wait = options.wait
 
 
-    def get_swatches_from_data(self, data, html=False):
+    def _get_swatches_from_data_(self, data, html=False):
         """Retrieves swatch values from data"""
 
         if html is False:
@@ -161,7 +154,7 @@ class CSVParser():
 
 
     def get_swatches(self):
-        """Provides data to get_swatches_from_data"""
+        """Provides data to _get_swatches_from_data_"""
 
         # Get swatches from clipboard or CSV file
         if self.mode == 'clipboard':
@@ -170,11 +163,11 @@ class CSVParser():
             clipboard_data = pyperclip.paste()
 
             if 'HEX,' in clipboard_data:  # simple check for valid CSV data
-                self.get_swatches_from_data(clipboard_data.splitlines())
+                self._get_swatches_from_data_(clipboard_data.splitlines())
                 # splitlines() only works here? ^ wut o_O
             elif '<font color=#' in clipboard_data:  # must be our own HTML output
                 messager('status_html')
-                self.get_swatches_from_data(clipboard_data, html=True)
+                self._get_swatches_from_data_(clipboard_data, html=True)
             else:
                 messager(
                     ['error_clipboard_nodata', 'info_tryhelp'],
@@ -184,7 +177,7 @@ class CSVParser():
             if self.csv_file is not None:
                 messager('status_file', self.csv_file)
                 with open(self.csv_file) as f:
-                    self.get_swatches_from_data(f)
+                    self._get_swatches_from_data_(f)
             else:
                 messager(
                     ['error_nodata', 'info_tryhelp'],
