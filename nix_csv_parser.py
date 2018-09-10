@@ -72,7 +72,6 @@ class Swatch():
 
         self._get_html_()
 
-
     def _get_html_(self):
         """Generate swatch output HTML"""
 
@@ -111,7 +110,6 @@ class CSVParser():
                 self.mode = 'clipboard'
         else:
             self.csv_file = options.file
-
 
     def _get_swatches_from_data_(self, data, html=False):
         """Retrieves swatch values from data"""
@@ -152,7 +150,6 @@ class CSVParser():
                     rgb_value = (red, green, blue)
                     self.swatches.append(Swatch(hex_value, rgb_value))
 
-
     def get_swatches(self):
         """Provides data to _get_swatches_from_data_"""
 
@@ -184,7 +181,6 @@ class CSVParser():
                     exit_after=True, wait=self.wait
                 )
 
-
     def sort_swatches(self):
         """Sort swatches by hue, saturation, or value."""
 
@@ -214,7 +210,6 @@ class CSVParser():
         else:
             messager(['error_sort', 'info_tryhelp'], extra_info=sort_type,
                      exit_after=True, wait=self.wait)
-
 
     def output_swatches(self):
         """ Output swatches to console and clipboard. """
@@ -251,7 +246,7 @@ def main():
         '-v', '--version', action='version', version='version: %s' % VERSION
     )
 
-    print() # Blank line for formatting
+    print()     # Blank line for formatting
 
     options = arg_parser.parse_args()
 
